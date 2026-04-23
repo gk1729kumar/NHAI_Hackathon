@@ -1,0 +1,112 @@
+# ReflectScan AI - Configuration File
+# Customize these parameters for your deployment
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ML MODEL PARAMETERS
+# ─────────────────────────────────────────────────────────────────────────────
+calibration:
+  model_type: "physics_based_regression"  # physics_based_regression | cnn_regression | ensemble
+  
+  # Brightness-to-RL mapping (calibrated for Indian roads)
+  brightness_coefficient: 2.85           # Linear mapping coefficient
+  brightness_exponent: 1.15              # Non-linear exponent (gamma)
+  base_reference_rl: 250.0               # Reference mcd/m²/lux
+  
+  # Environmental depreciation factors
+  wet_condition_factor: 0.65             # Water film reduces RL by ~35%
+  fog_condition_factor: 0.78             # Fog attenuation ~22%
+  night_infrared_gain: 1.9               # IR illumination boost
+  contamination_factor: 0.85             # Dust/dirt aging
+  
+  # Image processing
+  adaptive_threshold_block_size: 15      # OpenCV adaptive threshold block
+  adaptive_threshold_constant: 15        # Threshold adjustment
+  min_marking_coverage_pct: 0.5          # Minimum detected marking %
+  morphological_iterations: 2            # Closing iterations
+  
+  # Quality control
+  min_image_quality_score: 0.3           # Reject if quality < 0.3
+  max_luminance_saturation: 240          # Flag if clipped
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAINTENANCE THRESHOLDS
+# ─────────────────────────────────────────────────────────────────────────────
+maintenance_thresholds:
+  critical:
+    compliance_min: 0.0
+    compliance_max: 0.7
+    action_days: 1
+    description: "IMMEDIATE maintenance required"
+  
+  degraded:
+    compliance_min: 0.7
+    compliance_max: 1.0
+    action_days: 7
+    description: "Schedule within 1 week"
+  
+  warning:
+    compliance_min: 1.0
+    compliance_max: 1.3
+    action_days: 30
+    description: "Schedule within 30 days"
+  
+  caution:
+    compliance_min: 1.3
+    compliance_max: 1.7
+    action_days: 90
+    description: "Routine inspection cycle"
+  
+  healthy:
+    compliance_min: 1.7
+    compliance_max: 999.0
+    action_days: 365
+    description: "No action required"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REPORT SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+report_settings:
+  formats:
+    - console
+    - csv
+    - json
+    - html
+  
+  filenames:
+    csv: "reflectscan_report.csv"
+    json: "reflectscan_report.json"
+    html: "reflectscan_report.html"
+  
+  image_output:
+    enabled: true
+    format: "jpg"
+    quality: 95
+  
+  batch_processing:
+    batch_size: 50              # Images per batch
+    enable_progress_bar: true
+    save_intermediate: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SURVEY CONFIGURATION
+# ─────────────────────────────────────────────────────────────────────────────
+survey:
+  highway_name: "National Highway"
+  survey_vehicle_speed_kmh: 70
+  estimated_scan_distance_km: 100
+  gps_enabled: true
+  metadata:
+    survey_date: "2024-01-15"
+    surveyor: "ReflectScan Team"
+    equipment: "Vehicle-mounted Camera + IR Illuminator"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADVANCED OPTIONS
+# ─────────────────────────────────────────────────────────────────────────────
+advanced:
+  use_gpu: false                         # CUDA acceleration (if available)
+  multi_processing: true                 # Enable parallel processing
+  num_workers: 4                         # Number of worker threads
+  cache_processed_images: false          # Memory optimization
+  enable_logging: true                   # Detailed logging
+  log_level: "INFO"                      # DEBUG | INFO | WARNING | ERROR
